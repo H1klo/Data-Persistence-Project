@@ -58,7 +58,7 @@ public class DataFlow : MonoBehaviour
 #else
         Application.Quit();
 #endif
-        SaveData("", "","");
+        
     }
     // Update is called once per frame
     [System.Serializable]
