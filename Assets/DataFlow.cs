@@ -14,8 +14,15 @@ public class DataFlow : MonoBehaviour
 {
     // Start is called before the first frame update
     public static DataFlow dataFlow;
-    [SerializeField]public string userName;
+    [SerializeField]public string leaderName;
+    [SerializeField] public string currentName;
+    [SerializeField] public string bestScore;
+    [SerializeField] public string previousName;
     public InputField textField;
+    public Text textScore;
+
+
+    
     private void Awake()
     {
         if(dataFlow!= null)
@@ -25,11 +32,21 @@ public class DataFlow : MonoBehaviour
         }
         dataFlow = this;
         DontDestroyOnLoad(gameObject);
-        LoadName();
+        
+        
+        
     }
-    
+    private void Start()
+    {
+        LoadData();
+        textScore.text = "Best score: " + leaderName + ": " + bestScore;
+        textField.text = previousName;
+    }
+
     public void StartPressed()
     {
+        currentName = textField.text;
+        
         SceneManager.LoadScene(0);
     }
 
@@ -41,41 +58,48 @@ public class DataFlow : MonoBehaviour
 #else
         Application.Quit();
 #endif
+        SaveData("", "","");
     }
     // Update is called once per frame
     [System.Serializable]
-    class SaveDataName
+    class DataToSave
     {
-        public string userName;
+        public string leaderName;
+        public string bestScore;
+        public string previousName;
     }
 
-    public void SaveName()
+    
+    public void SaveData(string newUser, string newScore, string currentName)
     {
-        SaveDataName saveDataName = new SaveDataName();
         
-        saveDataName.userName = textField.text;
-        string json = JsonUtility.ToJson(saveDataName);
+        DataToSave dataToSave = new DataToSave();
+        dataToSave.bestScore = newScore;
+        dataToSave.leaderName = newUser;
+        dataToSave.previousName = currentName;
+        Debug.Log(dataToSave.previousName);
+        string json = JsonUtility.ToJson(dataToSave);
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
-        Debug.Log("Name saved");
+        Debug.Log("saved");
     }
-    public void LoadName()
+    
+    public void LoadData()
     {
         string path = Application.persistentDataPath + "/savefile.json";
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
-            SaveDataName saveDataName = JsonUtility.FromJson<SaveDataName>(json);
-            userName = saveDataName.userName;
-            try { textField.text = saveDataName.userName; }
-            catch { };
-            Debug.Log(userName);
-        }
 
+            DataToSave dataToSave = JsonUtility.FromJson<DataToSave>(json);
+            bestScore = dataToSave.bestScore;
+            leaderName = dataToSave.leaderName;
+            previousName = dataToSave.previousName;
+            try { textField.text = dataToSave.previousName; }
+            catch { }
+            Debug.Log(previousName);
+        }
     }
 
     
-    class SaveScoreData
-    {
-
-    }
+    
 }

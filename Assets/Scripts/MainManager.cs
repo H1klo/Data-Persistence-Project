@@ -20,7 +20,7 @@ public class MainManager : MonoBehaviour
 
     public Text bestScore;
 
-
+    private int bestScoreInt;
     // Start is called before the first frame update
     void Start()
     {
@@ -38,8 +38,10 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
-        
-        bestScore.text = "Best Score: 0 Name: " + DataFlow.dataFlow.userName;
+        DataFlow.dataFlow.LoadData();
+        try { bestScoreInt = int.Parse(DataFlow.dataFlow.bestScore); }
+        catch { bestScoreInt = 0; }
+        bestScore.text = "Best Score: " + bestScoreInt +" Name: " + DataFlow.dataFlow.leaderName;
     }
 
     private void Update()
@@ -59,10 +61,20 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            if (m_Points > bestScoreInt)
+            {
+                
+                DataFlow.dataFlow.SaveData(DataFlow.dataFlow.currentName, m_Points.ToString(), DataFlow.dataFlow.currentName);
+            }
+            else { DataFlow.dataFlow.SaveData(DataFlow.dataFlow.leaderName, bestScoreInt.ToString(), DataFlow.dataFlow.currentName); }
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
+            
+
+            
         }
     }
 
@@ -74,6 +86,7 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
